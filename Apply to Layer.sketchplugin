@@ -1,0 +1,70 @@
+#import 'assets/css-parse.js'
+#import 'assets/css-apply.js'
+#import 'assets/helpers.js'
+
+var initialize, getCSSInput, parseCSSInput;
+
+initialize = function(){
+  if (selection.count() === 0) {
+    var warnModal;
+    warnModal = alertWindow();
+    warnModal.setMessageText("Uh oh!");
+    warnModal.setInformativeText("You must first select a layer.");
+    return warnModal.runModal();
+  }
+
+  var selectionLoop = selection.objectEnumerator();
+  while (item = selectionLoop.nextObject()) {
+    if (item.isKindOfClass(MSShapeGroup)) {
+      var cssInput, cssData, appliedResult;
+
+      cssInput = getCSSInput(item.name());
+      if (cssInput) cssData = new ParseCSS(cssInput[0]);
+      if (cssData) appliedResult = new ApplyCSS(item, cssData, cssInput[1]);
+      if (appliedResult && appliedResult[0] !== 0) unsuccessfulStyles(appliedResult[1]);
+    }
+  }
+}
+
+getCSSInput = function(itemName) {
+  var returnedInput, inputModal, inputField, overwriteToggle, modalResponse;
+
+  inputField = NSTextField.alloc().initWithFrame(NSMakeRect(0, 0, 300, 200));
+  inputField.setFont(NSFont.fontWithName_size("Monaco", 12));
+  inputField.enablesReturnKeyAutomatically = false;
+
+  overwriteToggle = NSButton.alloc().initWithFrame(NSMakeRect(0, 0, 300, 15));
+  overwriteToggle.setButtonType(NSSwitchButton);
+  overwriteToggle.setTitle("Overwrite Fills, Borders, and Shadows?");
+
+  inputModal = alertWindow(true);
+  inputModal.setMessageText("Apply CSS to Selected Layer: " + itemName);
+  inputModal.setInformativeText("Type or Paste in your CSS to be applied to this layer.\nControl + Return for new line.");
+  inputModal.addAccessoryView(inputField);
+  inputModal.addAccessoryView(overwriteToggle);
+
+  modalResponse = inputModal.runModal();
+
+  if (modalResponse !== 1000) return;
+
+  var cssInput = valueAtIndex(inputModal, 0);
+  if (cssInput.length() > 0) {
+    return [cssInput, valueAtIndex(inputModal, 1)];
+  };
+};
+
+unsuccessfulStyles = function(styles) {
+  var errorModal;
+
+  errorModal = alertWindow();
+  errorModal.setMessageText("Oops!");
+  errorModal.setInformativeText("The following styles could not be applied:");
+
+  for (var style in styles) {
+    errorModal.addTextLabelWithValue(style + ": " + styles[style] + ";");
+  }
+
+  errorModal.runModal();
+}
+
+initialize();
