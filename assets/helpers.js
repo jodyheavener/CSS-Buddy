@@ -36,3 +36,22 @@ Object.size = function(obj) {
   }
   return size;
 };
+
+// Return an array object as an array
+function arrayObjectInfo(object) {
+  for(var name in object) {
+    return [name, object[name]];
+  }
+}
+
+// Return Index of partial match in array
+function arraySearch(array, query) {
+  var i = 0;
+  while (i < array.length) {
+    if (array[i].indexOf(query) != -1) {
+      return i;
+    };
+    i = i + 1;
+  }
+  return -1;
+}

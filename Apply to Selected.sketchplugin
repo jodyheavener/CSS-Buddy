@@ -1,0 +1,98 @@
+#import 'assets/css-parse.js'
+#import 'assets/css-apply.js'
+#import 'assets/helpers.js'
+
+var ApplyToSelected;
+
+ApplyToSelected = (function() {
+
+  "use strict";
+
+  function ApplyToSelected() {
+    if (selection.count() == 0) return this.noSelection();
+
+    var selectionLoop, layer, layerType, cssInput, cssData, result;
+
+    selectionLoop = selection.objectEnumerator();
+    while (layer = selectionLoop.nextObject()) {
+      if (layer.isKindOfClass(MSShapeGroup)) layerType = "shape";
+      if (layer.isKindOfClass(MSTextLayer)) layerType = "text";
+      if (!layerType) return this.notSupported();
+
+      cssInput = this.getCSSInput(layer.name());
+      if (cssInput) cssData = new ParseCSS(cssInput[0]);
+      if (cssData) result = new ApplyCSS(layer, layerType, cssData, cssInput[1]);
+
+      // If there are any failed rules, warn
+      if (result && result.length > 0) this.unsuccessfulStyles(result.unhandled);
+    };
+
+    return;
+  };
+
+  ApplyToSelected.prototype.noSelection = function() {
+    var warnModal;
+
+    warnModal = alertWindow();
+    warnModal.setMessageText("Uh oh!");
+    warnModal.setInformativeText("You must first select a layer.");
+
+    return warnModal.runModal();
+  };
+
+  ApplyToSelected.prototype.notSupported = function() {
+    var warnModal;
+
+    warnModal = alertWindow();
+    warnModal.setMessageText("Uh oh!");
+    warnModal.setInformativeText("Sorry, that type of layer isn't supported.");
+
+    return warnModal.runModal();
+  };
+
+  ApplyToSelected.prototype.getCSSInput = function(layerName) {
+    var returnedInput, inputModal, inputField, overwriteToggle, modalResponse;
+
+    inputField = NSTextField.alloc().initWithFrame(NSMakeRect(0, 0, 300, 200));
+    inputField.setFont(NSFont.fontWithName_size("Monaco", 12));
+    inputField.enablesReturnKeyAutomatically = false;
+
+    overwriteToggle = NSButton.alloc().initWithFrame(NSMakeRect(0, 0, 300, 15));
+    overwriteToggle.setButtonType(NSSwitchButton);
+    overwriteToggle.setTitle("Overwrite Fills, Borders, and Shadows?");
+
+    inputModal = alertWindow(true);
+    inputModal.setMessageText("Apply CSS to Selected Layer: " + layerName);
+    inputModal.setInformativeText("Type or Paste in your CSS to be applied to this layer.\nControl + Return for new line.");
+    inputModal.addAccessoryView(inputField);
+    inputModal.addAccessoryView(overwriteToggle);
+
+    modalResponse = inputModal.runModal();
+
+    if (modalResponse != 1000) return;
+
+    var cssInput = valueAtIndex(inputModal, 0);
+    if (cssInput.length() > 0) return [cssInput, valueAtIndex(inputModal, 1)];
+  };
+
+  ApplyToSelected.prototype.unsuccessfulStyles = function(rules) {
+    var errorModal, i = 0;
+
+    errorModal = alertWindow();
+    errorModal.setMessageText("Oops!");
+    errorModal.setInformativeText("The following styles could not be applied:");
+
+    while (i < rules.length) {
+      var rule = arrayObjectInfo(rules[i])
+      errorModal.addTextLabelWithValue(rule[0] + ": " + rule[1] + ";");
+      i = i + 1;
+    };
+
+    errorModal.runModal();
+  };
+
+  return ApplyToSelected;
+
+})();
+
+new ApplyToSelected();
