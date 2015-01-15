@@ -1,0 +1,91 @@
+#import 'assets/css-layer.js'
+#import 'assets/css-parse.js'
+#import 'assets/css-apply.js'
+#import 'assets/helpers.js'
+
+var ApplyToSelected;
+
+ApplyToSelected = (function() {
+
+  "use strict";
+
+  function ApplyToSelected() {
+    this.sorryNotSorry();
+
+    // var cssInput, createdLayers;
+
+    // cssInput = this.getCSSInput();
+    // if (cssInput) createdLayers = new CSSLayer(cssInput);
+
+    // log(createdLayers);
+
+    // if (cssLayers) {
+    //   var i = 0;
+    //   while (i < cssLayers.length) {
+    //     var ruleset = cssLayers[i];
+
+
+    //     cssData = new ParseCSS(ruleset.rules);
+    //     if (cssData) result = new ApplyCSS(layer, layerType, cssData, 0);
+
+    //     // If there are any failed rules, warn
+    //     if (result && result.length > 0) this.unsuccessfulStyles(result.unhandled);
+
+    //     i = i + 1;
+    //   }
+    // }
+
+    return;
+  };
+
+  ApplyToSelected.prototype.sorryNotSorry = function() {
+    var warnModal;
+
+    warnModal = alertWindow();
+    warnModal.setMessageText("Create Layers");
+    warnModal.setInformativeText("Sorry! This feature isn't available yet.");
+
+    return warnModal.runModal();
+  };
+
+  ApplyToSelected.prototype.getCSSInput = function() {
+    var returnedInput, inputModal, inputField, overwriteToggle, modalResponse;
+
+    inputField = NSTextField.alloc().initWithFrame(NSMakeRect(0, 0, 300, 200));
+    inputField.setFont(NSFont.fontWithName_size("Monaco", 12));
+    inputField.enablesReturnKeyAutomatically = false;
+
+    inputModal = alertWindow(true);
+    inputModal.setMessageText("Create Layers from CSS");
+    inputModal.setInformativeText("Type or Paste in your CSS to create and style new layers. Special Sketch selectors available.\nControl + Return for new line.");
+    inputModal.addAccessoryView(inputField);
+
+    modalResponse = inputModal.runModal();
+
+    if (modalResponse != 1000) return;
+
+    var cssInput = valueAtIndex(inputModal, 0);
+    if (cssInput.length() > 0) return cssInput;
+  };
+
+  ApplyToSelected.prototype.unsuccessfulStyles = function(name, rules) {
+    var errorModal, i = 0;
+
+    errorModal = alertWindow();
+    errorModal.setMessageText("Oops!");
+    errorModal.setInformativeText("The following styles could not be applied:");
+
+    while (i < rules.length) {
+      var rule = arrayObjectInfo(rules[i])
+      errorModal.addTextLabelWithValue(rule[0] + ": " + rule[1] + ";");
+      i = i + 1;
+    };
+
+    errorModal.runModal();
+  };
+
+  return ApplyToSelected;
+
+})();
+
+new ApplyToSelected();
