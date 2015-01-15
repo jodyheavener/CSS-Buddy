@@ -4,7 +4,7 @@ A Sketch 3 plugin that allows you to use CSS on layers.
 
 **Note: this plugin is still in early stages of development.**
 
-![I am so sorry for this huge gif](https://dl.dropboxusercontent.com/s/k1nspcamay3tre0/CSSBuddyDemo.gif?dl=0)
+Click [riiiight here](https://dl.dropboxusercontent.com/s/k1nspcamay3tre0/CSSBuddyDemo.gif?dl=0) to see a demo (the gif bogged down this page).
 
 ## Usage
 
