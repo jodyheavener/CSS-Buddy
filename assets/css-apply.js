@@ -132,6 +132,20 @@ ApplyCSS = (function() {
   };
 
   /*
+   * Parse and attempt to extract a property's string value for applicable styles
+   */
+  ApplyCSS.prototype.parseValue = function(string, applicable) {
+    var values, i, data = {};
+
+    values = string.split(" ");
+
+    i = 0;
+    while (i < values.length) {
+
+    }
+  };
+
+  /*
    * Set up our apply methods object
    */
   ApplyCSS.prototype.apply = {};
