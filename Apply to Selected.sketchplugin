@@ -19,11 +19,12 @@ ApplyToSelected = (function() {
     while (layer = selectionLoop.nextObject()) {
       if (layer.isKindOfClass(MSShapeGroup)) layerType = "shape";
       if (layer.isKindOfClass(MSTextLayer)) layerType = "text";
+      if (layer.isKindOfClass(MSArtboardGroup)) layerType = "artboard";
       if (!layerType) return this.notSupported();
 
       cssInput = this.getCSSInput(layer.name());
       if (cssInput) cssData = new ParseCSS(cssInput[0]);
-      if (cssData) result = new ApplyCSS(layer, layerType, cssData, cssInput[1]);
+      if (cssData) result = new ApplyCSS(layer, layerType, cssData, Number(cssInput[1]));
 
       // If there are any failed rules, warn
       if (result && result.length > 0) this.unsuccessfulStyles(result.unhandled);

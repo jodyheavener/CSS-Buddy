@@ -6,13 +6,17 @@ ApplyCSS = (function() {
 
   function ApplyCSS(layer, type, rules, overwrite) {
     this.layer = layer;
-    this.overwrite = Number(overwrite);
+    this.type = type;
+    this.rules = rules;
+    this.overwrite = overwrite;
+
     this.propertyGroups = {};
     this.unhandled = [];
+
     this.apply._this = this;
 
-    for (var rule in rules) {
-      this.sortProperty(rule, rules[rule]);
+    for (var rule in this.rules) {
+      this.sortProperty(rule, this.rules[rule]);
     };
 
     for (var propertyType in this.propertyGroups) {
@@ -53,6 +57,8 @@ ApplyCSS = (function() {
         propertyType = "opacity"; break;
       case property.indexOf("background") != -1:
         propertyType = "background"; break;
+      case property.indexOf("text-shadow") != -1:
+        propertyType = "text-shadow"; break;
       case property.indexOf("box-shadow") != -1:
         propertyType = "box-shadow"; break;
       case property.indexOf("radius") != -1:
@@ -61,6 +67,16 @@ ApplyCSS = (function() {
         propertyType = "border"; break;
       case property.indexOf("width") != -1:
         propertyType = "width"; break;
+      case property.indexOf("color") != -1:
+        propertyType = "color"; break;
+      case property.indexOf("line-height") != -1:
+        propertyType = "line-height"; break;
+      case property.indexOf("letter-spacing") != -1:
+        propertyType = "letter-spacing"; break;
+      case property.indexOf("text-align") != -1:
+        propertyType = "text-align"; break;
+      case property.indexOf("text-transform") != -1:
+        propertyType = "text-transform"; break;
       case property.indexOf("height") != -1:
         propertyType = "height"; break;
     };
@@ -142,6 +158,8 @@ ApplyCSS = (function() {
   ApplyCSS.prototype.apply.width = function(property, value) {
     var valueNoUnit = parseInt(value);
 
+    if (this._this.type != "shape" && this._this.type != "artboard") return false;
+
     // No min/max width
     // We can't process initial value
     // Sketch doesn't allow setting a 0px width
@@ -157,6 +175,8 @@ ApplyCSS = (function() {
    */
   ApplyCSS.prototype.apply.height = function(property, value) {
     var valueNoUnit = parseInt(value);
+
+    if (this._this.type != "shape" && this._this.type != "artboard") return false;
 
     // No min/max width
     // We can't process initial value
@@ -175,6 +195,8 @@ ApplyCSS = (function() {
    */
   ApplyCSS.prototype.apply.opacity = function(property, value) {
     var setContext;
+
+    if (this._this.type != "shape" && this._this.type != "text") return false;
 
     if (property != "opacity") return false;
 
@@ -201,6 +223,8 @@ ApplyCSS = (function() {
   ApplyCSS.prototype.apply["border-radius"] = function(property, value) {
     var i, shape, radiusValues;
     value = value.split(" ");
+
+    if (this._this.type != "shape") return false;
 
     if (property != "border-radius") return false;
 
@@ -248,6 +272,9 @@ ApplyCSS = (function() {
    */
   ApplyCSS.prototype.apply.border = function(property, value) {
     var propertyTest, borders, widthPosition, width, stylePosition, color, border;
+
+    if (this._this.type != "shape") return false;
+
     value = value.split(" ");
 
     // If only one border exists on that layer, we can do color or width
@@ -307,9 +334,106 @@ ApplyCSS = (function() {
   ApplyCSS.prototype.apply["box-shadow"] = function(property, value) {
     var shadow, inset, sizeMatch, sizeParams, color;
 
+    if (this._this.type != "shape") return false;
+
     if (value == "initial" || value == "none") {
       this._this.layer.style().shadows().removeAllObjects();
       this._this.layer.style().innerShadows().removeAllObjects();
+      return true;
+    };
+
+    if (value.indexOf("inset") != -1) {
+      inset = true;
+      value = value.replace("inset", "");
+    }
+
+    sizeMatch = value.match(new RegExp("((-?\\d+(?:\\.\\d*)?)(px)?,? ?){2,4}"))[0];
+    sizeParams = sizeMatch.trim().split(" ");
+    value = value.replace(sizeMatch, "");
+    if (sizeParams.length < 2) return false;
+
+    var i = 0;
+    while (i < sizeParams.length) {
+      var param = sizeParams[i];
+      if (param == "0") {
+        sizeParams[i] = param;
+      } else if (param.indexOf("px") != -1) {
+        sizeParams[i] = param.substr(0, param.indexOf("px"));
+      } else {
+        return false;
+      }
+      i = i +1;
+    }
+
+    color = this._this.MSColor(value.trim());
+    if (!color) return false;
+
+    if (inset) {
+      shadow = this._this.layer.style().innerShadows().addNewStylePart();
+    } else {
+      shadow = this._this.layer.style().shadows().addNewStylePart();
+    }
+
+    shadow.color = color;
+    shadow.offsetX = sizeParams[0];
+    shadow.offsetY = sizeParams[1];
+    if (sizeParams[2]) shadow.blurRadius = sizeParams[2];
+    if (sizeParams[3]) shadow.spread = sizeParams[3];
+
+    return true;
+  };
+
+  /*
+   * Apply a background as a fill
+   *
+   * TODO: Add support for background image (import the image from URL)
+   * TODO: Add support for gradient background
+   */
+  ApplyCSS.prototype.apply.background = function(property, value) {
+    var color, background;
+
+    if (this._this.type != "shape" && this._this.type != "artboard") return false;
+
+    if (property != "background" && property != "background-color") return false;
+
+    if (this._this.type == "artboard") this._this.layer.hasBackgroundColor = 1;
+
+    if (value == "initial") {
+      if (this._this.type == "artboard") {
+        this._this.layer.hasBackgroundColor = 0;
+        this._this.layer.backgroundColor = this._this.MSColor("#fff");
+      } else {
+        this._this.layer.style().fills().removeAllObjects();
+      }
+      return true;
+    };
+
+    color = this._this.MSColor(value);
+    if (!color) return false;
+
+    if (this._this.type == "artboard") {
+      this._this.layer.backgroundColor = color;
+    } else {
+      background = this._this.layer.style().fills().addNewStylePart();
+      background.fillType = 0;
+      background.color = color;
+    }
+
+    return true;
+  };
+
+  /*
+   * Apply a text shadow
+   *
+   * TODO: Reverse order applied to reflect CSS order
+   */
+  ApplyCSS.prototype.apply["text-shadow"] = function(property, value) {
+    var shadow, inset, sizeMatch, sizeParams, color;
+
+    if (this._this.type != "text") return false;
+
+    if (value == "initial" || value == "none") {
+      this._this.layer.style().shadows().removeAllObjects();
       return true;
     };
 
@@ -339,43 +463,130 @@ ApplyCSS = (function() {
     color = this._this.MSColor(value.trim());
     if (!color) return true;
 
-    if (inset) {
-      shadow = this._this.layer.style().innerShadows().addNewStylePart();
-    } else {
-      shadow = this._this.layer.style().shadows().addNewStylePart();
-    }
-
+    shadow = this._this.layer.style().shadows().addNewStylePart();
     shadow.color = color;
     shadow.offsetX = sizeParams[0];
     shadow.offsetY = sizeParams[1];
     if (sizeParams[2]) shadow.blurRadius = sizeParams[2];
-    if (sizeParams[3]) shadow.spread = sizeParams[3];
 
     return true;
   };
 
   /*
-   * Apply a background as a fill
-   *
-   * TODO: Add support for background image (import the image from URL)
-   * TODO: Add support for gradient background
+   * Apply text color
    */
-  ApplyCSS.prototype.apply.background = function(property, value) {
-    var color, background;
+  ApplyCSS.prototype.apply.color = function(property, value) {
+    var color;
 
-    if (property != "background" && property != "background-color") return false;
+    if (this._this.type != "text") return false;
 
     if (value == "initial") {
-      this._this.layer.style().fills().removeAllObjects();
-      return true;
-    };
+      color = this._this.MSColor("black")
+    } else {
+      color = this._this.MSColor(value.trim());
+    }
 
-    color = this._this.MSColor(value);
     if (!color) return false;
 
-    background = this._this.layer.style().fills().addNewStylePart();
-    background.fillType = 0;
-    background.color = color;
+    this._this.layer.textColor = color;
+
+    return true;
+  };
+
+  /*
+   * Apply line height
+   */
+  ApplyCSS.prototype.apply["line-height"] = function(property, value) {
+
+    if (this._this.type != "text") return false;
+
+    if (value.indexOf("px") == -1) return false;
+
+    this._this.layer.lineSpacing = value.substr(0, value.indexOf("px"));
+
+    return true;
+  };
+
+  /*
+   * Apply letter spacing
+   */
+  ApplyCSS.prototype.apply["letter-spacing"] = function(property, value) {
+
+    if (this._this.type != "text") return false;
+
+    if (value == "initial" || value == "0") {
+      value = "0px";
+    }
+
+    if (value.indexOf("px") == -1) return false;
+
+    this._this.layer.characterSpacing = value.substr(0, value.indexOf("px"));
+
+    return true;
+  };
+
+  /*
+   * Apply text alignment
+   */
+  ApplyCSS.prototype.apply["text-align"] = function(property, value) {
+    var alignmentValue, alignmentTest;
+
+    if (this._this.type != "text") return false;
+
+    alignmentTest = /center|left|right|justify|initial/.exec(value);
+
+    if (!alignmentTest) return false;
+
+    switch (alignmentTest[0]) {
+      case "left":
+      case "initial":
+        alignmentValue = 0;
+        break;
+      case "right":
+        alignmentValue = 1;
+        break;
+      case "center":
+        alignmentValue = 2;
+        break;
+      case "justify":
+        alignmentValue = 3;
+        break;
+    }
+
+    this._this.layer.textAlignment = alignmentValue;
+
+    return true;
+  };
+
+  /*
+   * Apply text transformation
+   */
+  ApplyCSS.prototype.apply["text-transform"] = function(property, value) {
+    var originalValue, transformedValue, transformTest;
+
+    if (this._this.type != "text") return false;
+
+    originalValue = this._this.layer.stringValue();
+
+    transformTest = /uppercase|lowercase|capitalize/.exec(value);
+
+    if (!transformTest) return false;
+
+    switch (transformTest[0]) {
+      case "uppercase":
+        transformedValue = originalValue.toUpperCase();
+        break;
+      case "lowercase":
+        transformedValue = originalValue.toLowerCase();
+        break;
+      case "capitalize":
+        transformedValue = originalValue.replace(/\w\S*/g, function(text){
+          return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+        });
+        break;
+    }
+
+    this._this.layer.stringValue = transformedValue;
 
     return true;
   };
