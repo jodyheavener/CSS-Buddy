@@ -1,6 +1,8 @@
-# CSS Buddy v0.0.3
+![CSS Buddy](https://dl.dropboxusercontent.com/s/2u83ofppl6w1hxm/GHLogo.png)
 
 A Sketch 3 plugin that allows you to use CSS on layers.
+
+`v0.0.3`
 
 **Note: this plugin is still in early stages of development.**
 

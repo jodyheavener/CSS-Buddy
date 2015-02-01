@@ -10,7 +10,7 @@ var pluginPath = sketch.scriptPath.substring(0, sketch.scriptPath.lastIndexOf("/
 function alertWindow(canCancel) {
   var modal = COSAlertWindow.new()
 
-  var icon = NSImage.alloc().initByReferencingFile(pluginPath + "/assets/icon.icns")
+  var icon = NSImage.alloc().initByReferencingFile(pluginPath + "/assets/icon.ico")
   modal.setIcon(icon)
 
   if (canCancel) {
