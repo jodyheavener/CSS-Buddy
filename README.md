@@ -1,4 +1,4 @@
-# CSS Buddy
+# CSS Buddy v0.0.3
 
 A Sketch 3 plugin that allows you to use CSS on layers.
 
@@ -103,3 +103,18 @@ Here is a small list of what I hope/plan to build in to the tool in the future..
       font-size: 20px;
     }
     ```
+
+## Changelog
+
+* v0.0.3 - January 15th 2015
+  * Added support for Artboard and Text Layers, and more property values for the respective layer types
+* v0.0.2 - January 15th 2015
+  * Rewritten code-base
+  * Increased flexibility when adding new property values
+  * Started "Create Layer" feature - putting on hold for now
+* v0.0.1 - January 13th 2015
+  * Initial release - Shapes only
+
+**Known Issues ¯\\_(ツ)_/¯** 
+
+* Text layers don't always refresh when a style is applied.
