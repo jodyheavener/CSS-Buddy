@@ -10,7 +10,7 @@ Click [riiiight here](https://dl.dropboxusercontent.com/s/k1nspcamay3tre0/CSSBud
 
 ## Usage
 
-Once you install the plugin just select a layer on your canvas and run _Apply to Selected_. A text dialogue will prompt you to enter in CSS.
+Once you install the plugin just select a layer on your canvas and run _Apply to Selected_ or press `Command` + `Shift` + `A`. A text dialogue will prompt you to enter in CSS.
 
 * Only use available and valid CSS properties – available properties listed below
 
@@ -110,6 +110,8 @@ Here is a small list of what I hope/plan to build in to the tool in the future..
 
 * v0.0.3 - January 15th 2015
   * Added support for Artboard and Text Layers, and more property values for the respective layer types
+  * Added keyboard shortcuts to apply styles and create layers
+  * Updated branding
 * v0.0.2 - January 15th 2015
   * Rewritten code-base
   * Increased flexibility when adding new property values
