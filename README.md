@@ -30,8 +30,8 @@ Once you install the plugin just select a layer on your canvas and run _Apply to
     }
     ```
 
-* Right now styles can only be applied to shapes. Support for applying styles to text and other layer types will be added eventually.
-* If any styles fail to apply or are unsupported a dialogue box will alert you to the failed attempts afterward.
+* Supported layer types are: **Shape**, **Text**, and **Artboard**.
+* If any styles fail to apply or are unsupported a dialogue box will (err, should) alert you to the failed attempts afterward.
 
 
 ### Overwriting
@@ -49,17 +49,35 @@ _Note:_ Sketch does not allow setting layer dimensions to `0`, so `0` is disable
 Acceptable color formats are Hexadecimal (`#FF7F50`), RGB (`rgb(255, 127, 80)`), RGBa (`rgba(255, 127, 80, 1)`), and generic [color names](http://www.crockford.com/wrrrld/color.html) (`coral`). Support for HSL format will be added eventually.
 
 ## CSS properties
-The following is a list of supported CSS properties that can be applied to a shape layer in Sketch:
+The following is a list of supported CSS properties that can be applied to a given layer in Sketch:
 
 _Note:_ for the most part only shorthand properties work. Support for longhand properties will be added eventually.
+
+### Shape
 
 * `width`
 * `height`
 * `opacity`
 * `box-shadow`
 * `border-radius`
-* `background` | `background-color`
+* `background` | `background-color` (fills only)
 * `border` | `border-width/color` when only one border exists
+
+### Text
+
+* `opacity`
+* `text-shadow`
+* `line-height`
+* `color`
+* `letter-spacing`
+* `text-transform`
+* `line-height`
+
+### Artboard
+
+* `width`
+* `height`
+* `background` | `background-color` (fills only)
 
 ## Going forward
 
@@ -79,7 +97,7 @@ Here is a small list of what I hope/plan to build in to the tool in the future..
       width: 100px;
       height: 150px;
     }
-    
+
     text[name="My Text"] {
       content: "This is some text!"
       font-size: 20px;
