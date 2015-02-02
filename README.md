@@ -108,7 +108,7 @@ Here is a small list of what I hope/plan to build in to the tool in the future..
 
 ## Changelog
 
-* v0.0.3 - January 15th 2015
+* v0.0.3 - January 31st 2015
   * Added support for Artboard and Text Layers, and more property values for the respective layer types
   * Added keyboard shortcuts to apply styles and create layers
   * Updated branding
@@ -119,6 +119,6 @@ Here is a small list of what I hope/plan to build in to the tool in the future..
 * v0.0.1 - January 13th 2015
   * Initial release - Shapes only
 
-**Known Issues ¯\\_(ツ)_/¯** 
+**Known Issues ¯\\_(ツ)_/¯**
 
 * Text layers don't always refresh when a style is applied.
